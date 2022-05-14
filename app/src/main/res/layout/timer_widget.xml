@@ -1,19 +1,59 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     style="@style/Widget.ToggleWrapper.AppWidget.Container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/Theme.ToggleWrapper.AppWidgetContainer">
+    android:theme="@style/Theme.ToggleWrapper.AppWidgetContainer"
+    android:padding="10dp"
+    android:background="@color/md_theme_dark_background">
 
-    <TextView
-        android:id="@+id/appwidget_text"
-        style="@style/Widget.ToggleWrapper.AppWidget.InnerView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:layout_margin="8dp"
-        android:contentDescription="@string/appwidget_text"
-        android:text="@string/appwidget_text"
-        android:textSize="24sp"
-        android:textStyle="bold|italic" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/md_theme_dark_primaryContainer"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/materialTextView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:text="Current time entry"
+            android:textColor="@color/md_theme_dark_onPrimaryContainer" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:text="for Self (Math)"
+            android:textColor="@color/md_theme_dark_onPrimaryContainer" />
+
+        <LinearLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:background="@color/md_theme_dark_primary"
+            android:padding="8dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/materialTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="32:05"
+                android:textColor="@color/md_theme_dark_onPrimary" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/ic_stop_black_24dp"
+                app:tint="@color/md_theme_dark_onPrimary" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
 </RelativeLayout>
