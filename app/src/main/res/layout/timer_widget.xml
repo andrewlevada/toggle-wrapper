@@ -16,7 +16,7 @@
         android:padding="8dp">
 
         <TextView
-            android:id="@+id/materialTextView2"
+            android:id="@+id/timeEntryLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -31,7 +31,7 @@
             android:textColor="@color/md_theme_dark_onPrimaryContainer" />
 
         <LinearLayout
-            android:id="@+id/constraintLayout"
+            android:id="@+id/stopTimeButton"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_alignParentEnd="true"
@@ -40,7 +40,7 @@
             android:gravity="center_vertical">
 
             <TextView
-                android:id="@+id/materialTextView"
+                android:id="@+id/timeEntryTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="32:05"
