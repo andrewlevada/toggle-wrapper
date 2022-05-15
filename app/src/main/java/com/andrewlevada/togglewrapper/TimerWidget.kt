@@ -9,6 +9,7 @@ import android.widget.RemoteViews
 import com.andrewlevada.togglewrapper.service.getCurrentTimeEntry
 
 const val STOP_TIMER_ACTION = "com.andrewlevada.togglewrapper.STOP_TIMER_ACTION";
+const val REFRESH_ACTION = "com.andrewlevada.togglewrapper.REFRESH_ACTION";
 
 class TimerWidget : AppWidgetProvider() {
     override fun onUpdate(
@@ -17,10 +18,8 @@ class TimerWidget : AppWidgetProvider() {
         appWidgetIds: IntArray
     ) {
         // There may be multiple widgets active, so update all of them
-        println("onUpdate")
-        for (appWidgetId in appWidgetIds) {
+        for (appWidgetId in appWidgetIds)
             updateAppWidget(context, appWidgetManager, appWidgetId)
-        }
     }
 
     override fun onEnabled(context: Context) {
@@ -34,8 +33,16 @@ class TimerWidget : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
 
-        if (STOP_TIMER_ACTION == intent.action) {
-            println("STOP_TIMER_ACTION")
+        when (intent.action) {
+            STOP_TIMER_ACTION -> {
+                println("STOP_TIMER_ACTION")
+            }
+            REFRESH_ACTION -> {
+                // Get widget
+                val appWidgetManager = AppWidgetManager.getInstance(context)
+                val widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+                updateAppWidget(context, appWidgetManager, widgetId)
+            }
         }
     }
 }
@@ -46,25 +53,24 @@ internal fun updateAppWidget(
     appWidgetId: Int
 ) {
     // Construct the RemoteViews object
-    val views = RemoteViews(context.packageName, R.layout.timer_widget)
+    var views = RemoteViews(context.packageName, R.layout.timer_widget)
 
-    println("HELOOO")
+    views.setOnClickPendingIntent(R.id.stop_time_button, getPendingSelfIntent(context, STOP_TIMER_ACTION, appWidgetId))
+    views.setOnClickPendingIntent(R.id.widget_surface, getPendingSelfIntent(context, REFRESH_ACTION, appWidgetId))
 
     getCurrentTimeEntry { timeEntry ->
-        if (timeEntry == null) return@getCurrentTimeEntry
-
-        views.setTextViewText(R.id.timeEntryLabel, timeEntry.description)
-        views.setTextViewText(R.id.timeEntryTime, timeEntry.start)
-
-        views.setOnClickPendingIntent(R.id.stopTimeButton, getPendingSelfIntent(context, STOP_TIMER_ACTION))
-
-        appWidgetManager.updateAppWidget(appWidgetId, views)
+//        views = RemoteViews(context.packageName, R.layout.timer_widget)
+        views.setTextViewText(R.id.timeEntryLabel, timeEntry?.description ?: "Idle")
+        views.setTextViewText(R.id.timeEntryTime, timeEntry?.start ?: "")
+        appWidgetManager.partiallyUpdateAppWidget(appWidgetId, views)
     }
 
+    appWidgetManager.updateAppWidget(appWidgetId, views)
 }
 
-internal fun getPendingSelfIntent(context: Context, action: String): PendingIntent {
+internal fun getPendingSelfIntent(context: Context, action: String, appWidgetId: Int): PendingIntent {
     val intent = Intent(context, TimerWidget::class.java)
     intent.action = action
-    return PendingIntent.getBroadcast(context, 0, intent, 0)
+    intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+    return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 }
