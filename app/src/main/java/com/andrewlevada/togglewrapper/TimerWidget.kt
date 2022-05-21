@@ -8,6 +8,10 @@ import android.content.Intent
 import android.view.View
 import android.widget.RemoteViews
 import com.andrewlevada.togglewrapper.service.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 const val STOP_TIMER_ACTION = "com.andrewlevada.togglewrapper.STOP_TIMER_ACTION";
 const val REFRESH_ACTION = "com.andrewlevada.togglewrapper.REFRESH_ACTION";
@@ -68,6 +72,11 @@ internal fun updateAppWidget(
         if (timeEntry == null) return@getCurrentTimeEntry // TODO: show different layout
         runningTimeEntryUpdate(views, appWidgetManager, appWidgetId, timeEntry, null)
 
+        val job = tickTime {
+            views.setTextViewText(R.id.time_entry_time, getDisplayDurationOfTimeEntry(timeEntry))
+            appWidgetManager.partiallyUpdateAppWidget(appWidgetId, views)
+        }
+
         if (timeEntry.pid != null) {
             var project = db().toggleProjectsDao().getById(timeEntry.pid)
             if (project == null) syncProjectsInDao(timeEntry.wid) {
@@ -93,7 +102,7 @@ internal fun runningTimeEntryUpdate(
         return
     }
 
-    views.setTextViewText(R.id.time_entry_time, "32:05") // TODO: time calculation
+    views.setTextViewText(R.id.time_entry_time, getDisplayDurationOfTimeEntry(timeEntry))
     views.setViewVisibility(R.id.time_entry_time, View.VISIBLE)
 
     val info = "${project?.name ?: ""} ${timeEntry.tags.toString()}"
@@ -109,6 +118,18 @@ internal fun runningTimeEntryUpdate(
     views.setTextViewText(R.id.time_entry_title, info)
     views.setViewVisibility(R.id.time_entry_label, View.GONE)
     appWidgetManager.partiallyUpdateAppWidget(appWidgetId, views)
+}
+
+internal fun tickTime(callback: () -> Unit): Job {
+    val scope = MainScope()
+    var debugLimit = 0
+    return scope.launch {
+        while (debugLimit < 20) {
+            delay(1000)
+            debugLimit++
+            callback.invoke()
+        }
+    }
 }
 
 internal fun getPendingSelfIntent(context: Context, action: String, appWidgetId: Int): PendingIntent {
